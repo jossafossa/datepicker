@@ -1,61 +1,66 @@
-import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import styles from "./DatePicker.module.scss";
+import { useDatePicker } from "./DatePicker.hooks";
+import { Calendar } from "./components";
+import { useState } from "react";
+
+const DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
 type DatePickerProps = {
-  value?: string;
-  onChange?: (value: string) => void;
+  value?: Date;
+  onChange: (value?: Date) => void;
   dateFormat?: string;
 };
 
-const formatDate = (date: string, formatString: string) => {
-  try {
-    const formattedDate = format(date, formatString);
-    return formattedDate;
-  } catch {
-    return undefined;
-  }
-};
-
 export const DatePicker = ({
-  value = "",
+  value,
   onChange,
-  dateFormat = "yyyy-MM-dd",
+  dateFormat = DEFAULT_DATE_FORMAT,
 }: DatePickerProps) => {
-  const [inputValue, setInputValue] = useState<string>(
-    formatDate(value, dateFormat) ?? ""
-  );
-  const [error, setError] = useState<string | null>(null);
+  const { inputValue, error, handleBlur, handleClear, setInputValue } =
+    useDatePicker({ value, onChange, dateFormat });
 
-  useEffect(() => {
-    const formattedValue = formatDate(value, dateFormat);
-    if (formattedValue) {
-      setInputValue(formattedValue);
-      setError(null);
-    } else {
-      setInputValue(value);
-      setError("Invalid date format");
-    }
-  }, [value, dateFormat]);
+  const [showCalendar, setShowCalendar] = useState(false);
 
-  const handleBlur = () => {
-    const formattedDate = formatDate(inputValue, dateFormat);
-    if (!formattedDate) {
-      setError("Invalid date format");
-      return;
-    }
-    setError(null);
-    setInputValue(formattedDate);
-    onChange?.(formattedDate);
+  const handleCalendarChange = (date: Date | null) => {
+    onChange(date ?? undefined);
+    setShowCalendar(false);
   };
 
   return (
-    <div>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(event) => setInputValue(event.target.value)}
-        onBlur={handleBlur}
-      />
+    <div className={styles.datePicker}>
+      <div className={styles.inputWrapper}>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(event) => setInputValue(event.target.value)}
+          onBlur={handleBlur}
+          className={styles.input}
+        />
+        {inputValue && (
+          <div className={styles.clearButtonWrapper}>
+            <button
+              className={`${styles.button} ${styles.clearButton}`}
+              onClick={handleClear}
+            >
+              x
+            </button>
+          </div>
+        )}
+        <button
+          className={`${styles.button} ${styles.calendarButton}`}
+          onClick={() => setShowCalendar(!showCalendar)}
+        >
+          ::
+        </button>
+      </div>
+      {showCalendar && (
+        <Calendar
+          selected={value}
+          onChange={handleCalendarChange}
+          dateFormat={dateFormat}
+          onClose={() => setShowCalendar(false)}
+        />
+      )}
       {error && <span>{error}</span>}
     </div>
   );

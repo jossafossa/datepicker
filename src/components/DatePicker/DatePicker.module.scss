@@ -1,0 +1,47 @@
+.datePicker {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.inputWrapper {
+  --close-with: 2.5rem;
+  --border-color: black;
+  --padding: 0.5rem;
+  --height: 2.5rem;
+  display: flex;
+  align-items: stretch;
+  height: var(--height);
+  border: 1px solid var(--border-color);
+}
+
+.input {
+  border: none;
+  padding: 0;
+  font: inherit;
+  padding-inline: var(--padding);
+  flex: 1;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--height);
+  height: var(--height);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.clearButton {
+  width: var(--close-with);
+  height: var(--height);
+  position: absolute;
+}
+
+.clearButtonWrapper {
+  position: relative;
+  width: 0;
+  display: flex;
+  justify-content: flex-end;
+}
