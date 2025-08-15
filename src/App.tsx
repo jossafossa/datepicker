@@ -11,7 +11,7 @@ const Demo = ({ dateFormat = "yyyy-MM-dd", ...props }: DemoProps) => {
     setDate(newDate);
   };
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column" }}>
       <input
         type="date"
         placeholder="Enter a date"
@@ -22,6 +22,7 @@ const Demo = ({ dateFormat = "yyyy-MM-dd", ...props }: DemoProps) => {
         {...props}
         value={date}
         onChange={handleChange}
+        placeholder={dateFormat}
         dateFormat={dateFormat}
       />
     </div>
@@ -30,10 +31,20 @@ const Demo = ({ dateFormat = "yyyy-MM-dd", ...props }: DemoProps) => {
 
 const App = () => {
   return (
-    <div>
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        gap: "20px",
+      }}
+    >
       <Demo dateFormat="yyyy-MM-dd" />
       <Demo dateFormat="dd-MM-yyyy" />
       <Demo dateFormat="MM/dd/yyyy" />
+      <Demo dateFormat="d MMM yyyy" />
     </div>
   );
 };

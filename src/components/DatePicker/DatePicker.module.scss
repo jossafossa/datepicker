@@ -12,6 +12,10 @@
   align-items: stretch;
   height: var(--height);
   border: 1px solid var(--border-color);
+
+  &:focus-within {
+    outline: 1px solid var(--border-color);
+  }
 }
 
 .input {
@@ -20,6 +24,10 @@
   font: inherit;
   padding-inline: var(--padding);
   flex: 1;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .button {
@@ -44,4 +52,8 @@
   width: 0;
   display: flex;
   justify-content: flex-end;
+}
+
+.error {
+  border-color: red;
 }

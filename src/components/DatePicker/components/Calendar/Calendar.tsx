@@ -7,6 +7,7 @@ import {
 } from "react";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import styles from "./Calendar.module.scss";
 
 type CalendarProps = ComponentProps<typeof ReactDatePicker> & {
   onClose?: () => void;
@@ -26,8 +27,10 @@ export const Calendar = ({ onClose, ...props }: CalendarProps) => {
   };
 
   return (
-    <div ref={ref} onKeyDown={handleKeyDown}>
-      <ReactDatePicker {...props} inline />
+    <div ref={ref} className={styles.calendarWrapper} onKeyDown={handleKeyDown}>
+      <div className={styles.calendar}>
+        <ReactDatePicker {...props} inline />
+      </div>
     </div>
   );
 };

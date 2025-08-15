@@ -1,11 +1,16 @@
 import styles from "./DatePicker.module.scss";
 import { useDatePicker } from "./DatePicker.hooks";
-import { Calendar } from "./components";
-import { useState } from "react";
+import { Calendar, Error } from "./components";
+import { useState, type InputHTMLAttributes } from "react";
+import { classNames } from "./utils";
+import { numericTransformer } from "./transformers";
 
 const DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
-type DatePickerProps = {
+type DatePickerProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "type" | "onChange" | "value"
+> & {
   value?: Date;
   onChange: (value?: Date) => void;
   dateFormat?: string;
@@ -15,9 +20,17 @@ export const DatePicker = ({
   value,
   onChange,
   dateFormat = DEFAULT_DATE_FORMAT,
+  className,
+  onKeyDown,
+  ...inputProps
 }: DatePickerProps) => {
   const { inputValue, error, handleBlur, handleClear, setInputValue } =
-    useDatePicker({ value, onChange, dateFormat });
+    useDatePicker({
+      value,
+      onChange,
+      dateFormat,
+      inputTransformers: [numericTransformer(dateFormat)],
+    });
 
   const [showCalendar, setShowCalendar] = useState(false);
 
@@ -26,20 +39,30 @@ export const DatePicker = ({
     setShowCalendar(false);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    onKeyDown?.(event);
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      console.log("cursor position:", event.currentTarget.selectionStart);
+    }
+  };
+
   return (
     <div className={styles.datePicker}>
-      <div className={styles.inputWrapper}>
+      <div className={classNames(styles.inputWrapper, error && styles.error)}>
         <input
           type="text"
           value={inputValue}
           onChange={(event) => setInputValue(event.target.value)}
           onBlur={handleBlur}
-          className={styles.input}
+          className={classNames(styles.input, className)}
+          onKeyDown={handleKeyDown}
+          {...inputProps}
         />
         {inputValue && (
           <div className={styles.clearButtonWrapper}>
             <button
-              className={`${styles.button} ${styles.clearButton}`}
+              className={classNames(styles.button, styles.clearButton)}
               onClick={handleClear}
             >
               x
@@ -47,7 +70,7 @@ export const DatePicker = ({
           </div>
         )}
         <button
-          className={`${styles.button} ${styles.calendarButton}`}
+          className={classNames(styles.button, styles.calendarButton)}
           onClick={() => setShowCalendar(!showCalendar)}
         >
           ::
@@ -61,7 +84,7 @@ export const DatePicker = ({
           onClose={() => setShowCalendar(false)}
         />
       )}
-      {error && <span>{error}</span>}
+      {error && <Error>{error}</Error>}
     </div>
   );
 };
