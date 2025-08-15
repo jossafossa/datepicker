@@ -1,9 +1,10 @@
 import styles from "./DatePicker.module.scss";
 import { useDatePicker } from "./DatePicker.hooks";
 import { Calendar, Error } from "./components";
-import { useState, type InputHTMLAttributes } from "react";
+import { useId, type InputHTMLAttributes } from "react";
 import { classNames } from "./utils";
 import { numericTransformer } from "./transformers";
+import { useCalendarState } from "./hooks";
 
 const DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -14,6 +15,7 @@ type DatePickerProps = Omit<
   value?: Date;
   onChange: (value?: Date) => void;
   dateFormat?: string;
+  id?: string;
 };
 
 export const DatePicker = ({
@@ -21,9 +23,12 @@ export const DatePicker = ({
   onChange,
   dateFormat = DEFAULT_DATE_FORMAT,
   className,
-  onKeyDown,
+  id,
   ...inputProps
 }: DatePickerProps) => {
+  const generatedId = useId();
+  const pickerId = id ?? generatedId;
+  const { openId, setOpenId } = useCalendarState();
   const { inputValue, error, handleBlur, handleClear, setInputValue } =
     useDatePicker({
       value,
@@ -32,19 +37,11 @@ export const DatePicker = ({
       inputTransformers: [numericTransformer(dateFormat)],
     });
 
-  const [showCalendar, setShowCalendar] = useState(false);
+  const showCalendar = openId === pickerId;
 
   const handleCalendarChange = (date: Date | null) => {
     onChange(date ?? undefined);
-    setShowCalendar(false);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    onKeyDown?.(event);
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      console.log("cursor position:", event.currentTarget.selectionStart);
-    }
+    setOpenId(null);
   };
 
   return (
@@ -56,7 +53,6 @@ export const DatePicker = ({
           onChange={(event) => setInputValue(event.target.value)}
           onBlur={handleBlur}
           className={classNames(styles.input, className)}
-          onKeyDown={handleKeyDown}
           {...inputProps}
         />
         {inputValue && (
@@ -71,7 +67,7 @@ export const DatePicker = ({
         )}
         <button
           className={classNames(styles.button, styles.calendarButton)}
-          onClick={() => setShowCalendar(!showCalendar)}
+          onClick={() => setOpenId(showCalendar ? null : pickerId)}
         >
           ::
         </button>
@@ -81,7 +77,7 @@ export const DatePicker = ({
           selected={value}
           onChange={handleCalendarChange}
           dateFormat={dateFormat}
-          onClose={() => setShowCalendar(false)}
+          onClose={() => setOpenId(null)}
         />
       )}
       {error && <Error>{error}</Error>}

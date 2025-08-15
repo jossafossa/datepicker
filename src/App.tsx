@@ -1,6 +1,7 @@
 import { useState, type ComponentProps } from "react";
 import { DatePicker } from "./components";
 import { format } from "date-fns";
+import { CalendarStateProvider } from "./components/DatePicker";
 
 type DemoProps = Omit<ComponentProps<typeof DatePicker>, "value" | "onChange">;
 
@@ -31,21 +32,23 @@ const Demo = ({ dateFormat = "yyyy-MM-dd", ...props }: DemoProps) => {
 
 const App = () => {
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        gap: "20px",
-      }}
-    >
-      <Demo dateFormat="yyyy-MM-dd" />
-      <Demo dateFormat="dd-MM-yyyy" />
-      <Demo dateFormat="MM/dd/yyyy" />
-      <Demo dateFormat="d MMM yyyy" />
-    </div>
+    <CalendarStateProvider>
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: "20px",
+        }}
+      >
+        <Demo dateFormat="yyyy-MM-dd" />
+        <Demo dateFormat="dd-MM-yyyy" />
+        <Demo dateFormat="MM/dd/yyyy" />
+        <Demo dateFormat="d MMM yyyy" />
+      </div>
+    </CalendarStateProvider>
   );
 };
 
